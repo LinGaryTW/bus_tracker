@@ -102,9 +102,10 @@ describe 'user' do
   
   it "print line summary" do
     user = User.new
+    user.name = 'Gary'
     user.target_station = '國父紀念館'
     summary = { line: '679', from: '民生社區', to: '大鵬新城' }
-    expect(user).to receive(:p).with("679 to 大鵬新城 is coming to 國父紀念館")
+    expect(user).to receive(:p).with("Hi Gary~ 679 往 大鵬新城 距離國父紀念館 只剩三站喔")
     user.print_notice(summary)
   end
 end

@@ -104,7 +104,11 @@ end
 
 class User
   include Subscriber
-  attr_accessor :target_station
+  attr_accessor :target_station, :name
+
+  def initialize(name = 'test user')
+    @name = name
+  end
 
   def set_alert_for_target_station(line, station)
     self.target_station = station
@@ -116,7 +120,7 @@ class User
   end
 
   def print_notice(line_summary)
-    p "#{line_summary[:line]} to #{line_summary[:to]} is coming to #{target_station}"
+    p "Hi #{name}~ #{line_summary[:line]} 往 #{line_summary[:to]} 距離#{target_station} 只剩三站喔"
   end
 end
 
