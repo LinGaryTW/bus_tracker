@@ -53,12 +53,12 @@ class Line
     @subscribers = @stations.each_with_object({}) { |station, result| result[station.name] = [] }
   end
 
-  def regist_subscriber(user)
-    @subscribers[user.target_station] << user
+  def regist_subscriber(user, target_station)
+    @subscribers[target_station] << user
   end
 
-  def summary
-    { line: name, from: start_location, to: end_location }
+  def summary(target_station)
+    { line: name, from: start_location, to: end_location, target_station: target_station }
   end
 
   def new_bus_start_serving_from(index, bus)
@@ -69,7 +69,7 @@ class Line
   def update(bus_position)
     stations_need_to_be_notified(bus_position).each do |station_name|
       @subscribers[station_name].each do |user|
-        user.update(summary)
+        user.update(summary(station_name))
       end
       @subscribers[station_name] = []
     end
@@ -104,15 +104,14 @@ end
 
 class User
   include Subscriber
-  attr_accessor :target_station, :name
+  attr_accessor :name
 
   def initialize(name = 'test user')
     @name = name
   end
 
   def set_alert_for_target_station(line, station)
-    self.target_station = station
-    line.regist_subscriber(self)
+    line.regist_subscriber(self, station)
   end
 
   def update(line_summary)
@@ -120,7 +119,7 @@ class User
   end
 
   def print_notice(line_summary)
-    p "Hi #{name}~ #{line_summary[:line]} 往 #{line_summary[:to]} 距離#{target_station} 只剩三站喔"
+    p "Hi #{name}~ #{line_summary[:line]} 往 #{line_summary[:to]} 距離#{line_summary[:target_station]} 只剩三站喔"
   end
 end
 

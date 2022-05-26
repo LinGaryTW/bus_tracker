@@ -10,8 +10,8 @@ describe "bus_tracker" do
     line672_to_Dapeng.new_bus_start_serving_from(0, bus)
     user1.set_alert_for_target_station(line672_to_Dapeng, '博仁醫院')
     user2.set_alert_for_target_station(line672_to_Dapeng, '博仁醫院')
-    expect(user1).to receive(:print_notice).with(line672_to_Dapeng.summary)
-    expect(user2).to receive(:print_notice).with(line672_to_Dapeng.summary)
+    expect(user1).to receive(:print_notice).with(line672_to_Dapeng.summary('博仁醫院'))
+    expect(user2).to receive(:print_notice).with(line672_to_Dapeng.summary('博仁醫院'))
     bus.leave
     bus.arrive
   end
@@ -28,7 +28,8 @@ describe 'line' do
   end
 
   it 'create new line' do
-    expect(@line.summary).to eq({ line: '1', from: 'start_location', to: 'end_location'})
+    expect(@line.summary('test')).to eq({ line: '1', from: 'start_location',
+                                          to: 'end_location', target_station: 'test'})
     expect(@line.stations).to be_a_kind_of(Array)
     expect(@line.stations[0]).to be_a_kind_of(Station)
     expect(@line.instance_variable_get(:@subscribers)['station1']).to eq([])
@@ -41,10 +42,13 @@ describe 'line' do
     expect(bus.position).to be(1)
   end
 
+  it 'regist subscriber' do
+
+  end
+
   it 'update information to notify users' do
     user = User.new
-    user.target_station = 'station3'
-    @line.regist_subscriber(user)
+    @line.regist_subscriber(user, 'station3')
     expect(user).to receive(:update)
     @line.update(1)
     expect(@line.instance_variable_get(:@subscribers)['station3']).to eq([])
@@ -96,15 +100,12 @@ describe 'user' do
     line_subscribers = line.instance_variable_get(:@subscribers)
     expect(line_subscribers).to eq({ 'station1' => [user1], 'station2' => [user2],
                                      'station3' => [], 'station4' => [] })
-    expect(user1.target_station).to eq('station1')
-    expect(user2.target_station).to eq('station2')
   end
   
   it "print line summary" do
     user = User.new
     user.name = 'Gary'
-    user.target_station = '國父紀念館'
-    summary = { line: '679', from: '民生社區', to: '大鵬新城' }
+    summary = { line: '679', from: '民生社區', to: '大鵬新城', target_station: '國父紀念館' }
     expect(user).to receive(:p).with("Hi Gary~ 679 往 大鵬新城 距離國父紀念館 只剩三站喔")
     user.print_notice(summary)
   end
