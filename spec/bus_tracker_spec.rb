@@ -41,18 +41,21 @@ describe 'line' do
     expect(bus.position).to be(1)
   end
 
-  it 'remaining users sholud be notified' do
+  it 'update information to notify users' do
     user = User.new
     user.target_station = 'station3'
     @line.regist_subscriber(user)
-    expect(@line.send(:remaining_users_sholud_be_notified, 1)).to eq([user])
+    expect(user).to receive(:update)
+    @line.update(1)
+    expect(@line.instance_variable_get(:@subscribers)['station3']).to eq([])
   end
 
-  it 'users who subscribe spicific station' do
-    user = User.new
-    user.target_station = 'station4'
-    @line.regist_subscriber(user)
-    expect(@line.send(:users_who_subscribe_spicific_station, 0)).to eq([user])
+  it 'remaining stations sholud be notified' do
+    expect(@line.send(:remaining_stations_sholud_be_notified, 1)).to eq(['station2', 'station3', 'station4'])
+  end
+
+  it 'spicific station' do
+    expect(@line.send(:spicific_station, 0)).to eq(['station4'])
   end
 
   it 'only three stations from ending station' do

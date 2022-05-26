@@ -67,37 +67,38 @@ class Line
   end
 
   def update(bus_position)
-    users_need_to_be_notified(bus_position).each do |user|
-      user.update(summary)
+    stations_need_to_be_notified(bus_position).each do |station_name|
+      @subscribers[station_name].each do |user|
+        user.update(summary)
+      end
+      @subscribers[station_name] = []
     end
   end
 
   private
 
-  def users_need_to_be_notified(bus_position)
+  def stations_need_to_be_notified(bus_position)
     if three_stations_less_from_ending_station(bus_position)
-      remaining_users_sholud_be_notified(bus_position)
+      remaining_stations_sholud_be_notified(bus_position)
     else
-      users_who_subscribe_spicific_station(bus_position)
+      spicific_station(bus_position)
     end
   end
 
-  def users_who_subscribe_spicific_station(bus_position)
-    @subscribers[@stations[bus_position + 3].name]
+  def spicific_station(bus_position)
+    [@stations[bus_position + 3].name]
   end
 
   def three_stations_less_from_ending_station(bus_position)
     bus_position + 3 > @stations.length - 1
   end
 
-  def remaining_users_sholud_be_notified(bus_position)
-    users = []
+  def remaining_stations_sholud_be_notified(bus_position)
+    stations = []
     for i in (bus_position..@stations.length - 1)
-      if !@subscribers[@stations[i].name].empty?
-        @subscribers[@stations[i].name].each { |user| users << user }
-      end
+      stations << @stations[i].name
     end
-    users
+    stations
   end
 end
 
